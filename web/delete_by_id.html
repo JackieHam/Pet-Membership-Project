@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Delete by ID</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/select2.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+<style type="text/css">
+	body {background-color: rgb(229, 242, 255);}
+	.header {color:rgb(226, 241, 255); font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;}
+	h1.header {color:rgb(233, 233, 252); font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+	h2 {color:rgb(105, 105, 250); text-indent: 40px; margin-top: 40px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif}
+    li {margin-top: 10px;} 
+    button {margin: 10px;}
+</style>
+</head>
+
+<body>
+<!-- <input> -->
+<div class="main-wrapper">
+	<div class="header">
+		<header>
+			<h3 style="margin-top: 10px; text-indent: 100px;" id="header">Membership Information Management System</h3>
+			<ul class="nav user-menu float-right">
+				<li class="nav-item dropdown has-arrow" style="top: -57px">
+                    <a href="#" class="dropdown-toggle nav-link user-link" data-toggle="dropdown">
+                        <span class="user-img">
+							<img class="rounded-circle" src="assets/img/user.jpg" width="24" alt="Admin">
+							<span class="status online"></span>
+						</span>
+						<span>Admin</span>
+                    </a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="profile.html">My Profile</a>
+						<a class="dropdown-item" href="edit-profile.html">Edit Profile</a>
+						<a class="dropdown-item" href="settings.html">Settings</a>
+						<a class="dropdown-item" href="login.html">Logout</a>
+					</div>
+                </li>
+            </ul>
+		</header>
+	</div>
+
+	<div class="sidebar" id="sidebar">
+		<div class="sidebar-inner slimscroll">
+			<div id="sidebar-menu" class="sidebar-menu">
+				<ul>
+					<li class="menu-title">Main</li>
+					<li>
+						<a href="Membership Info Management System.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+					</li>
+					<li class="submenu">
+						<a href="#"><i class="fa fa-search"></i> <span>Search for Member</span> <span class="menu-arrow"></span></a>
+						<ul style="display: none;">
+							<li><a href="search_by_id.html">Search by ID</a></li>
+							<li><a href="search_by_name.html">Search by Name</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="Update Member.html"><i class="fa fa-edit"></i> <span>Update Member Info</span></a>
+					</li>
+					<li>
+						<a href="Insert Member.html"><i class="fa fa-user-plus"></i> <span>Create New Member</span></a>
+					</li>
+					<li class="submenu">
+						<a href="#"><i class="fa fa-user-times"></i> <span>Delete Member</span><span class="menu-arrow"></span></a>
+						<ul style="display: none;">
+							<li><a class="active" href="delete_by_id.html">Delete by ID</a></li>
+							<li><a href="delete_by_name.html">Delete by Name</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="page-wrapper">
+        <div><h2>Delete Existing Member By ID</h2>
+            <p style="margin-left: 50px;">id: <input type="number" id="deleteId"/> <button id="delete" class="btn btn-primary btn-primary-three float-middle">Delete</button></p>
+        </div>
+        <!-- End of delete by id -->
+    </div>
+</div>
+</body>
+
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script>
+    // key VS value
+	function myTest() {
+		var test = [];
+		test.push ({"name": "jackie", "age": 18, "gender": "female"}, {"name": "jerry", "age": 22, "gender": "male"})
+		console.log("----0----", test[0]);
+		keySet = []
+		keySet2 = []
+		keySet.push(test[0])
+		console.log("pushed the whole element into keyset =====", keySet);
+		// test[0] === {"name": "jackie", "age": 18, "gender": "female"}
+	
+		// test   t 0 1 2 3 
+		for (var t in test[0]) {
+		console.log('--------t-----', t)
+
+
+
+			console.log("logging values from the element containing a key-value set ======", test[0][t]);
+			keySet2.push(t);
+			// pushing key to a new list from the element containing a key-value set
+		}
+		console.log(test);
+		console.log("pushed the properties within the element into keyset2 ===", keySet2);
+	}
+
+	function getKeySet(obj) {
+		var keyset = [];
+		for (var property in obj) {
+			keyset.push(property);
+		}
+		return keyset;
+	}
+
+    $("#delete").click(function() {
+		var searchId = $("#deleteId").val();
+		console.log("----id----", searchId)
+		if(searchId == "") {
+			alert("Please key in Member id of the member you want to delete!");
+		} else {
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/deletemember",
+				type: "GET",
+				data: {id: searchId},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function (res) {
+					if (res.code == 0) {
+						alert("Member with id #" + searchId + " has been successfully deleted!");
+					} else if (res.code == 50002) {
+						alert("Id is a mandatory field! Message from system: " + res.msg);
+					} else if (res.code == 50004) {
+						alert("No member with member id #" + searchId + " found! Msg from system: " + res.msg);
+					}
+				},
+				error: function() {
+					alert("Failed to delete Information of member id #" + searchId + " due to backend error!")
+				}
+			})
+		}
+	})
+	// End of Delete Member by ID by GET
+</script>
+
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.dataTables.min.js"></script>
+<script src="assets/js/dataTables.bootstrap4.min.js"></script>
+<script src="assets/js/jquery.slimscroll.js"></script>
+<script src="assets/js/select2.min.js"></script>
+<script src="assets/js/moment.min.js"></script>
+<script src="assets/js/bootstrap-datetimepicker.min.js"></script>
+<script src="assets/js/app.js"></script>
+
+</html>

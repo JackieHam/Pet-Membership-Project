@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Info Management System</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+<style type="text/css">
+	body {background-color: rgb(229, 242, 255);}
+	.header {font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;}
+	h1.header {color:blue;}
+	h2.header {color:rgb(105, 105, 250)}
+</style>
+
+</head>
+
+<body>
+<!-- <input> -->
+<div class="main-wrapper">
+	<div class="header">
+		<header>
+			<h1 class="header" id="h1 header">Membership Information Management System</h1>
+		</header>
+	</div>
+	<div class="sidebar"></div>
+</div>
+
+
+	<div><h2 class="h2 header">Search for Member by ID</h2>
+		<p style="margin-left: 50px;">id: <input type="number" id="searchId" ></input> <button id="search">search</button></p>
+		<ul align="left" style="margin-left: 50px;" class="content" style="list-style:outside" >
+			<li>id: <span id="s1"></span></li>
+			<li>name: <span id="s2"></span></li>
+			<li>gender: <span id="s3"></span></li>
+			<li>age: <span id="s4"></span></li>
+			<li>phone number: <span id="s5"></span></li>
+			<li>balance: <span id="s6"></span></li>
+			<li>member level: <span id="s7"></span></li>
+			<li>registration date: <span id="s8"></span></li>
+		</ul>
+	</div>
+	<!-- End of search section -->
+
+	<div><h2 class="h2 header">Search for Member by Name</h2>
+		<p style="margin-left: 50px;">name: <input type="string" id="searchName"></input> <button id="searchByName">search</button></p>
+		<div id="resultTable"></div>
+	</div>
+
+	<div>
+		<h2 class="header">Update/Create New Member Information</h2>
+		<ul style="margin-left: 50px;">
+			<li>id: <input type="number" id="id" value=""/></li>
+			<li>name: <input type="text" id="name" value=""/></li>
+			<li>gender: <select id="gender"><option  value="true">male</option> <option value="false">female</option></select></li>
+			<li>age: <input type="number" id="age" min="0" max="120"/></li>
+			<li>phone number: <input type="tel" id="phoneNumber"/></li>
+			<li>balance: <input type="number" id="balance" value=""/></li>
+			<li>member level: <select id="memberLevel"><option>1</option> <option>2</option> <option>3</option> <option>4</option> <option>5</option></select></li>
+			<li>registration date: <input type="date" id="registrationDate" value=""/></li>
+			<button id="update">update</button> <button id="insert">insert</button>
+		</ul>
+	</div>
+	<!-- End of update and insert section -->
+
+	<div><h2 class="header">Delete Existing Member By ID</h2>
+		<p style="margin-left: 50px;">id: <input type="number" id="deleteId"/> <button id="delete">delete</button></p>
+	</div>
+	<!-- End of delete section -->
+
+	<div><h2 class="header">Delete Existing Member By Name</h2>
+		<p style="margin-left: 50px;">name: <input type="string" id="deleteName"/> <button id="deleteByName">delete</button></p>
+	</div>
+
+
+	<button onclick="myTest()">test btn (check console)</button>
+
+</body>
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.slimscroll.js"></script>
+<script src="assets/js/Chart.bundle.js"></script>
+<script src="assets/js/chart.js"></script>
+<script src="assets/js/app.js"></script>
+
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script>
+	function getKeySet(obj) {
+		var keyset = [];
+		for (var property in obj) {
+			keyset.push(property);
+		}
+		return keyset;
+	}
+
+	// key VS value
+	function myTest() {
+		var test = [];
+		test.push ({"name": "jackie", "age": 18, "gender": "female"}, {"name": "jerry", "age": 22, "gender": "male"})
+		console.log("----0----", test[0]);
+		keySet = []
+		keySet2 = []
+		keySet.push(test[0])
+		console.log("pushed the whole element into keyset =====", keySet);
+		// test[0] === {"name": "jackie", "age": 18, "gender": "female"}
+	
+		// test   t 0 1 2 3 
+		for (var t in test[0]) {
+		console.log('--------t-----', t)
+
+
+
+			console.log("logging values from the element containing a key-value set ======", test[0][t]);
+			keySet2.push(t);
+			// pushing key to a new list from the element containing a key-value set
+		}
+		console.log(test);
+		console.log("pushed the properties within the element into keyset2 ===", keySet2);
+	}
+
+
+
+
+	$("#searchByName").click(function() {
+		var searchName=$("#searchName").val();
+		console.log("----name----", searchName);
+		if(searchName == "") {
+			alert("Please key in Member name to search for member!");
+		} else {
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/querymembername",
+				type: "GET",
+				data: {name: searchName},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function(res) {
+					console.log("----a----", res.data);
+					if (res.data.length== 0) {
+						alert("No member with member with name like '" + searchName + "' found!")
+					} else {
+						alert("Information of member with name like '" + searchName + "' has been displayed!");
+						var htmlstr="<table border= 1px>";
+						// htmlstr += "<tr><th>Id</th> <th>Name</th> <th>Gender</th> <th>Age</th> <th>Phone Number</th> <th>Balance</th> <th>Member Level</th> <th>Registration Date</th></tr>";
+						var list = res.data;
+						var keySet = [];
+						for (property in list[0]) {
+							keySet.push(property);
+						}
+						htmlstr += "<tr>";
+						for (var k in keySet) {
+							htmlstr += "<th>" + keySet[k] + "</th>"
+						}
+						for (var o in list) {
+							htmlstr += "<tr> "
+							var element = list[o];
+							for (var value in element) {
+								var tableData = element[value];
+								if (tableData == true) {
+									tableData = "male";
+								} else if (tableData == false) {
+									tableData = "female";
+								}
+								htmlstr += "<td>" + tableData + "</td>";
+							}
+							htmlstr += "</tr>"
+						}
+						document.getElementById("resultTable").innerHTML = htmlstr;
+					}
+				}
+			})
+
+		}
+	})
+	// End of JS Search by Name by POST
+
+	$("#search").click(function() {
+		var searchId=$("#searchId").val();
+		console.log("----id----", searchId)
+		if(searchId == "") {
+			alert("Please key in Member id to search for member!");
+		} else {
+			//ajax
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/querymember",
+				type: "GET",
+				data: {id: searchId},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function (res) {
+					console.log("----a----", res.data)
+					if (res.data==null) {
+						alert("No member with member id #" + searchId + " found!");
+					} else {
+						alert("Information of member id #" + searchId + " has been displayed!");
+						$("#s1").text(res.data.id);
+						$("#s2").text(res.data.name);
+						var gender = res.data.gender;
+						console.log(gender)
+						if (gender) {
+							gender = "male";
+						} else {
+							gender = "female";
+						}
+						$("#s3").text(gender);
+						$("#s4").text(res.data.age);
+						$("#s5").text(res.data.phoneNumber);
+						$("#s6").text(res.data.balance);
+						$("#s7").text(res.data.memberLevel);
+						$("#s8").text(res.data.registrationDate);
+					}
+				}
+			})
+		}
+	})
+	// End of JS Search by ID by GET
+
+
+	$("#update").click(function () {
+		var memberId = 	$("#id").val();
+		if(memberId == "") {
+			alert("Please key in Member id to update member information!");
+		} else {
+			var memberName = $("#name").val();
+			var memberGender = $("#gender").val();
+			var memberAge = $("#age").val();
+			var memberPhoneNumber = $("#phoneNumber").val();
+			var memberBalnce = $("#balance").val();
+			var memberLevel = $("#memberLevel").val();
+			var registrationDate = $("#registrationDate").val();
+			console.log('---name------',   JSON.stringify({id: memberId, name: memberName, gender: memberGender, age: memberAge, 
+				phoneNumber: memberPhoneNumber, balance: memberBalnce, memberLevel: memberLevel, registrationDate: registrationDate}))
+		//发送ajax请求
+			if(memberAge>120 || !Number.isInteger(Number(memberAge))) {
+				window.alert("Please put in a valid age (of whole number) within the range of 1-120!");
+			} else {
+				$.ajax({
+				url: "http://127.0.0.1:8081/member/updatemember",
+				type: "POST",
+				data: JSON.stringify({id: memberId, name: memberName, gender: memberGender, age: memberAge, phoneNumber: memberPhoneNumber, balance: memberBalnce, memberLevel: memberLevel, registrationDate: registrationDate}),
+				contentType: "application/json;charset=UTF-8",
+				//处理跨域问题
+				dataType: "text",
+				//接收数据
+				success: function (res) {
+					if (res == 1) {
+						console.log('---------aaa----------', res);
+						alert("Information of member with Id #" + memberId + " has been successfully updated!");
+					} else {
+						alert("No member with id #" + memberId + " found!");
+					}
+				}
+				})
+			}
+		}
+	})
+	// End of Update Member by Post
+
+
+
+	$("#insert").click(function() {
+		var id = $("#id").val();
+		var name = $("#name").val();
+		if(name=="") {
+			alert("Name is a mandatory field!");
+		}
+		var originalGender = $("#gender").val();
+		var gender = Number(originalGender);
+		var age = $("#age").val();
+		if(age>120 || !Number.isInteger(Number(age))) {
+			window.alert("Request failed. Please put in a valid age (of whole number) within the range of 1-120!");
+		}
+		var phoneNumber = $("#phoneNumber").val();
+		var balance = 	$("#balance").val();
+		var memberLevel = 	$("#memberLevel").val();
+		var registrationDate = 	$("#registrationDate").val();
+		var obj={
+			id, name, gender, age, phoneNumber, balance, memberLevel, registrationDate
+		}
+		console.log('---name------',   JSON.stringify({obj}))
+		//发送ajax请求
+		$.ajax({
+		url: "http://127.0.0.1:8081/member/insertmember",
+		type: "POST",
+		data: JSON.stringify(obj),
+		contentType: "application/json;charset=UTF-8",
+		//处理跨域问题
+		dataType: "text",
+		//接收数据
+		success: function (res) {
+			var jsonRes = $.parseJSON(res);
+			if (jsonRes.msg == "SUCCESS") {
+				console.log('---------aaa----------', res)
+				alert("Information of member with Id #" + jsonRes.data + " has been successfully added!")
+			} else {
+				alert("Member with id #" + id + " already exists! Please select another id, or leave the box blank to generate an id.")
+				console.log(res)
+			}
+		},
+		error: function (res) {
+			alert("an error has occured!")
+		}
+		})
+	})
+	// End of inserting member by POST
+
+
+	$("#delete").click(function() {
+		var searchId = $("#deleteId").val();
+		console.log("----id----", searchId)
+		if(searchId=="") {
+			alert("Please key in Member id of the member you want to delete!");
+		} else {
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/deletemember",
+				type: "GET",
+				data: {id: searchId},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function (res) {
+					if (res == 1) {
+						alert("Member with id #" + searchId + " has been successfully deleted!");
+					} else {
+						alert("No member with id #" + searchId + " found!");
+					}
+				},
+				error: function() {
+					alert("Failed to delete Information of member id #" + searchId + " due to backend error!")
+				}
+			})
+		}
+	})
+	// End of Delete Member by ID by GET
+
+
+	$("#deleteByName").click(function() {
+		console.log("test");
+		var searchName =$("#deleteName").val();
+		console.log("-----name-----", searchName);
+		if (searchName=="") {
+			alert("Please enter Member name to delete a member!")
+		} else {
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/deletemembername",
+				type: "GET",
+				data: {name: searchName},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function (res) {
+					if (res == 1) {
+						alert("Member with name '" + searchName + "' has been successfully deleted!");
+					} else {
+						alert("No member with name '" + searchName + "' found!")
+					}
+				},
+				error: function() {
+				alert("Failed to delete Information of member name '" + searchName + "' due to backend error!")
+				}
+			})
+		}
+	})
+	// End of Delete Member by Name by GET
+
+
+	// $("#delete").click(function() {
+	// 	var searchId = $("#deleteId").val();
+	// 	console.log("----id----", searchId)
+	// 	if(searchId=="") {
+	// 		alert("Please key in Member id of the member you want to delete!");
+	// 	} else {
+	// 		// ajax to query and find matching id
+	// 		$.ajax({
+	// 			url: "http://127.0.0.1:8081/member/querymember",
+	// 			type: "GET",
+	// 			data: {id: searchId},
+	// 			ContentType: "application/json;charset=UTF-8",
+	// 			dataType: "JSON",
+	// 			success: function(res) {
+	// 				if (res.data != null) {
+	// 					console.log("----a----", res.data)
+	// 					alert("Information of member id #" + searchId + " found and has been deleted!");
+	// 					// proceed to delete if id exists
+	// 					$.ajax({
+	// 						url: "http://127.0.0.1:8081/member/deletemember",
+	// 						type: "GET",
+	// 						data: {id: searchId},
+	// 						ContentType: "application/json;charset=UTF-8",
+	// 						dataType: "JSON",
+	// 						success: function (res) {
+	// 						},
+	// 			error: function() {
+	// 				alert("Failed to delete Information of member id #" + searchId + "!")
+	// 			}
+	// 		})
+	// 				} else {
+	// 					alert("No member with member id #" + searchId + " found!");
+	// 				}
+	// 			}
+	// 		})
+	// 	}
+	// })
+
+// 	//   GET 请求
+	// $("#search").click(function () {
+	// 	 var memberId = $("#id").val();
+	//  	//发送ajax请求
+	//  	$.ajax({
+	//  		url: "http://127.0.0.1:8081/member/querymember",
+	//  		type: "GET",
+	//  		data: {id: memberId},
+
+	//  		//处理跨域问题
+	//  		dataType: "JSON",
+	//  		//接收数据
+	//  		success: function (res) {
+	//  			console.log('---------aaa----------', res.data)
+
+	// 			$("#s1").text(res.data.id); 			
+	// 			$("#s2").text(res.data.name); 
+	// 			$("#s3").text(res.data.gender); 
+	// 			$("#s4").text(res.data.age); 
+	// 			$("#s5").text(res.data.balance); 
+	// 			$("#s6").text(res.data.memberLevel); 
+	//  		}
+	//  	})
+	//  })
+
+	// 	 //GET 请求
+	// 	 $("#search").click(function () {
+	// 	 var name = $("#name").val();
+	//  	//发送ajax请求
+	//  	$.ajax({
+	//  		url: "http://192.168.130.150:8080/admins",
+	//  		type: "GET",
+	//  		data: {adminName: name},
+	//  		//处理跨域问题
+	//  		dataType: "JSON",
+	//  		//接收数据
+	//  		success: function (res) {
+	//  			console.log('---------aaa----------', res.data)
+	// 			$("#s1").text(res.data[0].adminName); 			
+	// 			$("#s2").text(res.data[0].email); 
+	//  		}
+	//  	})
+	//  })
+
+	//  POST 请求
+	// $("#search").click(function () {
+	//     var name = 	$("#name").val();
+	// 	console.log('---name------',   name)
+	//   //发送ajax请求
+	// 	$.ajax({
+	// 		url: "http://127.0.0.1:8081/admin",
+	// 		type: "POST",
+	// 		data: JSON.stringify({adminName: name}),
+	// 		contentType: "application/json;charset=UTF-8",
+	// 		//处理跨域问题
+	// 		dataType: "text",
+	// 		//接收数据
+	// 		success: function (res) {
+	// 			console.log('---------aaa----------', res)
+	// 		}
+	// 	})
+	// })
+
+	// $("#insert").click(function () {
+	// 	var id = $("#id").val();
+	// 	var name = $("#name").val();
+	// 	if(name=="") {
+	// 		alert("Name is a mandatory field!");
+	// 	}
+	// 	var originalGender = $("#gender").val();
+	// 	var gender = Nusmber(originalGender);
+	// 	var age = $("#age").val();
+	// 	if(age>120 || !Number.isInteger(Number(age))) {
+	// 		window.alert("Request failed. Please put in a valid age (of whole number) within the range of 1-120!");
+	// 	}
+	// 	var phoneNumber = $("#phoneNumber").val();
+	// 	var balance = 	$("#balance").val();
+	// 	var memberLevel = 	$("#memberLevel").val();
+	// 	var registrationDate = 	$("#registrationDate").val();
+	// 	var obj={
+	// 		id, name, gender, age, phoneNumber, balance, memberLevel, registrationDate
+	// 	}
+	// 	console.log('---name------',   JSON.stringify({obj}))
+	// 	// ajax to query and find matching id
+	// 	$.ajax({
+	// 			url: "http://127.0.0.1:8081/member/querymember",
+	// 			type: "GET",
+	// 			data: {id: id},
+	// 			ContentType: "application/json;charset=UTF-8",
+	// 			dataType: "JSON",
+	// 			success: function(res) {
+	// 				if (res.data != null) {
+	// 					console.log("----a----", res.data)
+	// 					alert("Member of id #" + id + " already exists! Please select another id, or leave the box blank to generate an id.");
+	// 				} else {
+	// 					//发送ajax请求
+	// 						$.ajax({
+	// 						url: "http://127.0.0.1:8081/member/insertmember",
+	// 						type: "POST",
+	// 						data: JSON.stringify(obj),
+	// 						contentType: "application/json;charset=UTF-8",
+	// 						//处理跨域问题
+	// 						dataType: "text",
+	// 						//接收数据
+	// 						success: function (res) {
+	// 							console.log('---------aaa----------', res)
+	// 							alert("Information of member with Id #" + id + " has been successfully inserted!")
+	// 						}
+	// 					})
+	// 				}
+	// 			}
+	// 		})
+	// 	}
+	// )
+	// End of Insert Member by Post
+</script>
+
+	<script src="assets/js/jquery-3.2.1.min.js"></script>
+	<script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.slimscroll.js"></script>
+    <script src="assets/js/Chart.bundle.js"></script>
+    <script src="assets/js/chart.js"></script>
+    <script src="assets/js/app.js"></script>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Search by ID</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/select2.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+<style type="text/css">
+	body {background-color: rgb(229, 242, 255);}
+	.header {color:rgb(226, 241, 255); font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;}
+	h1.header {color:rgb(233, 233, 252); font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+	h2 {color:rgb(105, 105, 250); text-indent: 40px; margin-top: 40px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif}
+    li {margin-top: 10px;}
+    button {margin: 10px;}
+</style>
+</head>
+
+<body>
+<!-- <input> -->
+<div class="main-wrapper">
+	<div class="header">
+		<header>
+			<h3 style="margin-top: 10px; text-indent: 100px;" id="header">Membership Information Management System</h3>
+			<ul class="nav user-menu float-right">
+				<li class="nav-item dropdown has-arrow" style="top: -57px">
+                    <a href="#" class="dropdown-toggle nav-link user-link" data-toggle="dropdown">
+                        <span class="user-img">
+							<img class="rounded-circle" src="assets/img/user.jpg" width="24" alt="Admin">
+							<span class="status online"></span>
+						</span>
+						<span>Admin</span>
+                    </a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="profile.html">My Profile</a>
+						<a class="dropdown-item" href="edit-profile.html">Edit Profile</a>
+						<a class="dropdown-item" href="settings.html">Settings</a>
+						<a class="dropdown-item" href="login.html">Logout</a>
+					</div>
+                </li>
+            </ul>
+		</header>
+	</div>
+	
+	<div class="sidebar" id="sidebar">
+		<div class="sidebar-inner slimscroll">
+			<div id="sidebar-menu" class="sidebar-menu">
+				<ul>
+					<li class="menu-title">Main</li>
+					<li>
+						<a href="Membership Info Management System.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+					</li>
+					<li class="submenu">
+						<a href="#"><i class="fa fa-search"></i> <span>Search for Member</span> <span class="menu-arrow"></span></a>
+						<ul style="display: none;">
+							<li><a class="active" href="search_by_id.html">Search by ID</a></li>
+							<li><a href="search_by_name.html">Search by Name</a></li>
+						</ul>
+					</li>
+					<li>
+						<a href="Update Member.html"><i class="fa fa-edit"></i> <span>Update Member Info</span></a>
+					</li>
+					<li>
+						<a href="Insert Member.html"><i class="fa fa-user-plus"></i> <span>Create New Member</span></a>
+					</li>
+					<li class="submenu">
+						<a href="#"><i class="fa fa-user-times"></i> <span>Delete Member</span><span class="menu-arrow"></span></a>
+						<ul style="display: none;">
+							<li><a href="delete_by_id.html">Delete by ID</a></li>
+							<li><a href="delete_by_name.html">Delete by Name</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="page-wrapper">
+		<div><h2>Search for Member by ID</h2>
+			<p style="margin-left: 50px;">id: <input type="number" id="searchId" ></input> <button id="search" class="btn btn-primary btn-primary-two float-middle">Search</button></p>
+			<ul align="left" style="margin-left: 50px;" class="content" style="list-style:outside" >
+				<li>id: <span id="s1"></span></li>
+				<li>name: <span id="s2"></span></li>
+				<li>gender: <span id="s3"></span></li>
+				<li>age: <span id="s4"></span></li>
+				<li>phone number: <span id="s5"></span></li>
+				<li>balance: <span id="s6"></span></li>
+				<li>member level: <span id="s7"></span></li>
+				<li>registration date: <span id="s8"></span></li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+</body>
+<!-- <script src="assets/js/jquery-3.2.1.min.js"></script>
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.slimscroll.js"></script>
+<script src="assets/js/app.js"></script> -->
+
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+<script>
+	function getKeySet(obj) {
+		var keyset = [];
+		for (var property in obj) {
+			keyset.push(property);
+		}
+		return keyset;
+	}
+
+
+	$("#search").click(function() {
+		var searchId=$("#searchId").val();
+		console.log("----id----", searchId)
+		if(searchId == "") {
+			alert("Please key in Member id to search for member!");
+		} else {
+			//ajax
+			$.ajax({
+				url: "http://127.0.0.1:8081/member/querymember",
+				type: "GET",
+				data: {id: searchId},
+				ContentType: "application/json;charset=UTF-8",
+				dataType: "JSON",
+				success: function (res) {
+					console.log("----a----", res.data)
+					if (res.code == 50002) {
+						alert("Id is a mandatory field! Message from system: " + res.msg);
+					} else if (res.code == 50003) {
+						alert("Id must be greater than zero! Message from system: " + res.msg + ", pay attention to input value: " + resd.data);
+					} else if (res.code == 50004) {
+						alert("No member with member id #" + searchId + " found! Msg from system: " + res.msg);
+					} else {
+						$("#s1").text(res.data.id);
+						$("#s2").text(res.data.name);
+						var gender = res.data.gender;
+						console.log(gender)
+						if (gender) {
+							gender = "male";
+						} else {
+							gender = "female";
+						}
+						$("#s3").text(gender);
+						$("#s4").text(res.data.age);
+						$("#s5").text(res.data.phoneNumber);
+						$("#s6").text(res.data.balance);
+						$("#s7").text(res.data.memberLevel);
+						$("#s8").text(res.data.registrationDate);
+					}
+				}
+			})
+		}
+	})
+</script>
+
+<script src="assets/js/jquery-3.2.1.min.js"></script>
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/jquery.dataTables.min.js"></script>
+<script src="assets/js/dataTables.bootstrap4.min.js"></script>
+<script src="assets/js/jquery.slimscroll.js"></script>
+<script src="assets/js/select2.min.js"></script>
+<script src="assets/js/moment.min.js"></script>
+<script src="assets/js/bootstrap-datetimepicker.min.js"></script>
+<script src="assets/js/app.js"></script>
+
+</html>
